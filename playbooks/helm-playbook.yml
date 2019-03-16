@@ -1,0 +1,52 @@
+- hosts: all  
+  strategy: free
+  handlers: 
+    # Symlinks using file modules cause not found errors when using helm
+    - name: Link helm binary
+      notify: Create tiller account
+      become: true
+      copy: 
+        src: /tmp/linux-amd64/helm
+        dest: /usr/local/bin/helm
+        remote_src: yes
+        mode: +x
+      # file: 
+      #   src: "~/linux-amd64/helm"
+      #   dest: "~/bin/helm"
+      #   state: link
+      #   mode: +x
+
+    - name: Init tiller
+      notify: Add rancher helm repo
+      shell: helm init
+      args:
+        executable: /bin/bash
+      #args: 
+      #  creates: ~/.helm/repository/repositories.yaml
+
+    - name: Create tiller account
+      notify: Create tiller cluster role binding
+      shell: "kubectl create serviceaccount --namespace kube-system tiller"
+    - name: Create tiller cluster role binding
+      notify: Init helm
+      shell: "kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller"
+    - name: Init helm
+      notify: Wait for tiller to come up
+      shell: "helm init --service-account tiller --kubeconfig /etc/rancher/k3s/k3s.yaml"
+
+    # Handles error 'could not find a ready tiller pod'
+    - name: Wait for tiller to come up
+      shell: kubectl get pods -n kube-system | grep tiller-deploy
+      register: result
+      until: result.stdout.find("Running") != -1 and result.stdout.find("1/1") != -1
+      retries: 10
+      delay: 5
+
+  tasks: 
+    - name: Download helm
+      notify: Link helm binary
+      become: true
+      unarchive:
+        src: https://storage.googleapis.com/kubernetes-helm/helm-v2.13.0-rc.2-linux-amd64.tar.gz
+        dest: "/tmp"
+        remote_src: yes

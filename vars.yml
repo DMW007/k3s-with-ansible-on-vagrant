@@ -1,0 +1,12 @@
+# Notice that rancher got deployed by helm, so you cannot install rancher without helm
+install_helm: true
+
+rancher_hostname: rancher
+# https://github.com/rancher/k3s/issues/53
+coredns_upstream_dns: 192.168.0.19
+
+# SSH multiplexing to speed up performance and other tweaks, see https://dzone.com/articles/speed-up-ansible
+# and https://shadow-soft.com/turbo-charge-your-ansible/
+#ssh_args: -o ControlMaster=auto -o ControlPersist=60s
+#pipelining: true
+#gather_facts: no 

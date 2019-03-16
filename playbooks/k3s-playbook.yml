@@ -1,0 +1,32 @@
+- hosts: all  
+  strategy: free
+  tasks: 
+
+  # According to https://github.com/rancher/k3s/issues/60#issuecomment-467858023 we need to resolve the hostname, but it doesn't seem to really cause the error
+  # - name: Replace localhost by hostname
+  #   become: yes
+  #   args:
+  #     # linefile_module is not really suiteable since we want to replace dynamically with the real hostname of our machine to keep things flexible
+  #     warn: no
+  #   shell: 'sed -i "s/localhost/$(hostname -f)/g" /etc/hosts'
+
+  - name: Install k3s
+    command: "sh -c 'curl -sfL https://get.k3s.io | sh -'"
+    args:
+      creates: /usr/local/bin/k3s-uninstall.sh
+
+  - name: Wait for k3s.yml
+    wait_for: 
+      path: /etc/rancher/k3s/k3s.yaml
+
+  - name: Create .kube dir
+    file: 
+      path: ~/.kube
+      state: directory
+
+  # Required for helm
+  - name: Copy kubeconfig to default kubectl dir
+    copy: 
+      src: /etc/rancher/k3s/k3s.yaml
+      dest: ~/.kube/config
+      remote_src: yes

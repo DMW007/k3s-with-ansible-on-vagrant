@@ -1,0 +1,45 @@
+- hosts: all  
+  strategy: free
+  tasks: 
+  # Not required any more since coredns is used in k3s
+  # - name: Add external dns server
+  #   k8s:
+  #     state: present
+  #     definition: "{{ lookup('file', '../kubernetes/dns-configmap.yml') }}"
+
+  # Also a currently tested workaround for #60, since the restart workaround doesn't always fit
+  # Source: https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/#tabs-pod-install-4
+  - name: Init flannel (test)
+    shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml
+
+  # Workaround for https://github.com/rancher/k3s/issues/60
+  # Sometimes k3s doesn't get up. In this case we must wait before it's started (lookup in syslog) and then restart it
+  - name: Wait for containerd log
+    become: yes
+    wait_for:
+      path: /var/lib/rancher/k3s/agent/containerd/containerd.log
+  - name: Get containerd log
+    shell: grep -i 'no cni' /var/lib/rancher/k3s/agent/containerd/containerd.log
+    # Avoid ansibles error triggering when grep has no match and return 1: https://stackoverflow.com/a/41010653/3276634
+    failed_when: "containerd_log.rc == 2"
+    become: yes
+    register: containerd_log
+
+  - name: Restart k3s
+    shell: systemctl restart k3s
+    become: yes
+    when: containerd_log.stdout != ""
+
+  # Workaround for https://devops.stackexchange.com/questions/6519/kubernetes-on-k3s-cant-resolve-domains-from-custom-dns-server-fritz-box-with-d/
+  # K3s has hardcoded cloudflare dns server which make it impossible to use your own upstream dns
+  - name: Wait until coredns configmap exists
+    shell: kubectl get cm -n kube-system | grep coredns |awk '{print $2}'
+    register: result
+    until: result.stdout.find("1") != -1
+    failed_when: "result.rc == 2"
+    retries: 20
+    delay: 2
+  - name: K8s issue 53 -> Replacing hard coded cloudflare dns by custom one
+    shell: kubectl get cm coredns -n kube-system -o yaml | sed "s/proxy . 1.1.1.1/proxy . {{coredns_upstream_dns|quote}}/g" > coredns-fixed.yml
+  - name: Apply coredns changes
+    shell: kubectl apply -f coredns-fixed.yml

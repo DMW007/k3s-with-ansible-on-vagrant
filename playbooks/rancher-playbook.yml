@@ -1,0 +1,30 @@
+- hosts: all  
+  strategy: free
+  vars: 
+    - cert_manager_namespace: kube-system
+    - rancher_namespace: cattle-system
+  tasks: 
+    # We don't use the helm module here since it would require additionally port fordwarding from kubernetes, which is not the case on helm cli
+    - name: Add rancher helm repo
+      command: helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+
+    - name: Install cert manager
+      command: |
+        helm install stable/cert-manager \
+          --name cert-manager \
+          --namespace {{cert_manager_namespace}} \
+          --version v0.5.2
+
+    - name: Wait for cert-manager to be ready
+      shell: kubectl -n kube-system rollout status deploy/cert-manager
+      register: result
+      until: result.stdout.find("successfully rolled out") != -1
+      retries: 5
+      delay: 2
+
+    - name: Install rancher
+      command: |
+        helm install rancher-latest/rancher \
+          --name rancher \
+          --namespace {{rancher_namespace}} \
+          --set hostname={{rancher_hostname}}

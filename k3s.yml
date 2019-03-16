@@ -1,0 +1,26 @@
+- hosts: all,localhost
+  strategy: free
+
+  # vars_files:
+  #   - vars.yml
+
+  tasks:
+    - name: General Python dependencies
+      pip:
+        name:  
+        - setuptools
+        - docker-py
+        # k8s_module 
+        - openshift >= 0.6
+        - PyYAML >= 3.11
+
+- import_playbook: playbooks/k3s-playbook.yml
+- import_playbook: playbooks/k3s-workarounds-playbook.yml
+
+- import_playbook: playbooks/helm-playbook.yml
+  when: install_helm is defined and install_helm
+
+# Disabled until rancher ui works on k3s 
+# Requires install_rancher: true in vars.yml if activated later
+#- import_playbook: playbooks/rancher-playbook.yml
+#  when: install_rancher is defined and install_rancher

@@ -1,5 +1,5 @@
 ressources:
-  memory: 2048
+  memory: 4096
   cpus: 4
 
 rancher:

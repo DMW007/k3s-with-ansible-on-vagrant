@@ -15,7 +15,7 @@
         - PyYAML >= 3.11
 
 - import_playbook: playbooks/k3s-playbook.yml
-- import_playbook: playbooks/k3s-workarounds-playbook.yml
+  #- import_playbook: playbooks/k3s-workarounds-playbook.yml
 
 - import_playbook: playbooks/helm-playbook.yml
   when: install_helm is defined and install_helm

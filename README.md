@@ -2,9 +2,9 @@
 K3s is a new lightweight Kubernetes engine from rancher. Altough it's very easy and fast to setup, it's even better to automate this using Ansible. Vagrant opens the possibility for creating clean virtual machines on the fly. Especially for testing or development purpose, this is a great toolchain. The playbooks following a modular approach and also includes [Helm package manager](https://helm.sh/).
 
 ## Requirements
-- Ansible
-- Vagrant
-- VirtualBox
+- [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+- [Vagrant](https://www.vagrantup.com/downloads.html)
+- [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 
 ## Get started
 Clone the repo (`git clone`) and open the root folder. Take a look at `vars.yml` if you want to disable some packages like rancher. Now run `vagrant up --provision` and wait a few minutes. 

@@ -19,6 +19,21 @@
     wait_for: 
       path: /etc/rancher/k3s/k3s.yaml
 
+  # Per default, k3s creates its config in /etc/rancher/k3s/k3s.yaml with requires root permission. --write-kubeconfig-mode allows to customize that so that our vagrant user can access it
+  - name: Modify k3s service parameter
+    become: yes 
+    replace:
+      path: /etc/systemd/system/k3s.service
+      regexp: 'server (.+)?\\'
+      replace: 'server --write-kubeconfig-mode 644 \\'
+
+  - name: Reload and restart k3s service
+    become: yes
+    systemd:
+      name: k3s
+      state: restarted
+      daemon_reload: yes
+
   - name: Create .kube dir
     file: 
       path: ~/.kube
@@ -26,7 +41,9 @@
 
   # Required for helm
   - name: Copy kubeconfig to default kubectl dir
+    become: yes
     copy: 
       src: /etc/rancher/k3s/k3s.yaml
-      dest: ~/.kube/config
+      dest: "/home/{{ ansible_user_id }}/.kube/config"
       remote_src: yes
+      owner: "{{ ansible_user_id }}"

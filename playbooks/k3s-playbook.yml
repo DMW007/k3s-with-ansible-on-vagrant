@@ -34,14 +34,13 @@
       state: restarted
       daemon_reload: yes
 
+  # Let the user execute kubectl inside our VM
   - name: Create .kube dir
     file: 
       path: ~/.kube
       state: directory
 
-  # Required for helm
   - name: Copy kubeconfig to default kubectl dir
-    become: yes
     copy: 
       src: /etc/rancher/k3s/k3s.yaml
       dest: "/home/{{ ansible_user_id }}/.kube/config"

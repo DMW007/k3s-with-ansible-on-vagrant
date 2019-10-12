@@ -41,4 +41,7 @@ Using them, you can use different config files without tracking them to VCS. We 
 ### Build failed with _error: no objects passed to apply_
 
 ### Can I use Rancher UI? 
-Sadly no. I already tried this without success. You'll find a `rancher-playbook.yml` but k3s isn't full compatible yet. Altough I could make the UI itself running, some features like cattle doesn't work. Bug tickets like [#123](https://github.com/rancher/k3s/issues/123) [#69](https://github.com/rancher/k3s/issues/69) already exists. The latest development seems active, so it should be only a matter of time until this changes. For this reason, I leave the Rancher playbooks in our repo. 
+Sadly no. I already tried this without success. You'll find a `rancher-playbook.yml` but k3s isn't full compatible yet. Altough I could make the UI itself running, some features like cattle doesn't work. Bug tickets like [#123](https://github.com/rancher/k3s/issues/123) [#69](https://github.com/rancher/k3s/issues/69) already exists. The latest development seems active, so it should be only a matter of time until this changes. For this reason, I leave the Rancher playbooks in our repo.
+
+## ToDo
+This was one of my first real-world projects of Ansible and Vagrant. However it's useable, there are some things inside which I wouldn't do today (e.g. include child playbooks instead of using roles). I'm working on refactoring at least the largest issues to improve code quality.

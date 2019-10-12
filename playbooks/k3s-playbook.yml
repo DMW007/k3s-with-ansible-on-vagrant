@@ -20,6 +20,7 @@
       path: /etc/rancher/k3s/k3s.yaml
 
   # Per default, k3s creates its config in /etc/rancher/k3s/k3s.yaml with requires root permission. --write-kubeconfig-mode allows to customize that so that our vagrant user can access it
+  # https://rancher.com/docs/k3s/latest/en/installation/
   - name: Modify k3s service parameter
     become: yes 
     replace:

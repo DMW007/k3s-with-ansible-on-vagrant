@@ -11,7 +11,7 @@
   #   shell: 'sed -i "s/localhost/$(hostname -f)/g" /etc/hosts'
 
   - name: Install k3s
-    command: "sh -c 'curl -sfL https://get.k3s.io | sh -'"
+    shell: "curl -sfL https://get.k3s.io | sh -"
     args:
       creates: /usr/local/bin/k3s-uninstall.sh
 

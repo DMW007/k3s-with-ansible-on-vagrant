@@ -7,7 +7,7 @@ K3s is a new lightweight Kubernetes engine from rancher. Altough it's very easy 
 - [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 
 ## Get started
-Clone the repo (`git clone`) and open the root folder. Take a look at `vars.yml` if you want to disable some packages like rancher. Now run `vagrant up --provision` and wait a few minutes. To completely re-create the machine, execute the `./re-create-dev.sh` script. Please note that this destroys the VM (if exists). 
+Clone the repo (`git clone`) and open the root folder. Take a look at `vars.yml` if you want to disable some packages like rancher. Now run `vagrant up --provision` and wait a few minutes. To completely re-create the machine, execute the `./re-create-dev.sh` script. Please note that this destroys the VM (if exists). And per default it assumes that you copied `vars.yml` to `vars-dev.yaml`: `cp vars.yaml vars-dev.yml` The dev file is excluded from git, so you can easily modify it without pushing customized variables during contributions. 
 
 ## Ressources
 Having all components enabled in `vars.yml`, it took about 2 minutes from scratch (i7 machine). Depending on your hardware and internet connection, maybe so more or less. The memory footprint is very low. Including rancher, the complete machine takes less than 400MB. 

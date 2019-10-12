@@ -22,8 +22,9 @@ Vagrant.configure(2) do |config|
 #  config.vm.network "forwarded_port", guest: 443, host: cfg['host_https_port']
 #  end
   # ToDo: Add to config
-  config.vm.network "forwarded_port", guest: 80, host: 80
-  config.vm.network "forwarded_port", guest: 443, host: 443
+  # Tried to make them reachable from other machines in the same network (not full working yet): https://stackoverflow.com/questions/58352722/forward-port-to-public-host-interface-in-vagrant
+  config.vm.network "forwarded_port", guest: 80, host: 80, host_ip: "0.0.0.0"
+  config.vm.network "forwarded_port", guest: 443, host: 443, host_ip: "0.0.0.0"
   # Disable the new default behavior introduced in Vagrant 1.7, to ensure that all Vagrant machines will use the same SSH key pair.
   # See https://github.com/hashicorp/vagrant/issues/5005
   config.ssh.insert_key = cfg['insert_ssh_key']
